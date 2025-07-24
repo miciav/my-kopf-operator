@@ -1,0 +1,11 @@
+apiVersion: "myorg.io/v1"
+kind: AppDeployment
+metadata:
+  name: my-app
+  namespace: default
+spec:
+  replicas: 2
+  image: "nginx:latest"
+  port: 80
+  expose: true
+  checkIntervalSeconds: 30
