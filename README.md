@@ -6,6 +6,61 @@ This project is a Python-based Kubernetes operator built with the [Kopf](https:/
 
 The operator manages `AppDeployment` custom resources, which define the desired state of a simple web application. The operator will create, update, and delete Kubernetes `Deployments` and `Services` to match the state of the `AppDeployment` resources.
 
+## Architecture
+
+### Class Diagram
+
+This diagram shows the main components of the operator and their relationships.
+
+```mermaid
+classDiagram
+    class AppDeployment {
+        +spec
+        +status
+    }
+
+    class Operator {
+        +create_fn()
+        +update_fn()
+        +delete_fn()
+        +check_pods()
+    }
+
+    class Deployment {
+        +spec
+        +status
+    }
+
+    class Service {
+        +spec
+    }
+
+    AppDeployment --|> Operator : Manages
+    Operator --|> Deployment : Creates/Updates/Deletes
+    Operator --|> Service : Creates/Updates/Deletes
+```
+
+### Sequence Diagram
+
+This diagram illustrates the flow of events when a new `AppDeployment` is created.
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Kubernetes API
+    participant Operator
+    participant Deployment
+    participant Service
+
+    User->>Kubernetes API: Apply AppDeployment manifest
+    Kubernetes API->>Operator: Notify: AppDeployment created
+    Operator->>Kubernetes API: Create Deployment
+    Kubernetes API->>Deployment: Create
+    Operator->>Kubernetes API: Create Service (if expose=true)
+    Kubernetes API->>Service: Create
+    Operator->>Kubernetes API: Update AppDeployment status
+```
+
 ## CRD Schema
 
 The `AppDeployment` CRD has the following schema:
